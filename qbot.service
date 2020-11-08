@@ -1,0 +1,11 @@
+[Unit]
+Description=Qbot
+After=network.target
+[Service]
+Type=simple
+User=dani9oo
+ExecStart=npm run start
+WorkingDirectory=/home/dani9oo/qbot
+Restart=on-failure
+[Install]
+WantedBy=multi-user.target
