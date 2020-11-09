@@ -6,6 +6,7 @@ import { HelpCommand } from './help';
 import { CommandModel } from '../models/command';
 import { react } from './reaction';
 import { TeQuieroCommand } from './tq';
+import { PlayCommand } from './play';
 
 export class CommandProcessor {
     private commands: Command[];
@@ -13,7 +14,7 @@ export class CommandProcessor {
     private readonly prefix: string;
 
     constructor(prefix: string) {
-        const commandClasses = [PingCommand, TeQuieroCommand];
+        const commandClasses = [PingCommand, TeQuieroCommand, PlayCommand];
 
         this.commands = commandClasses.map(
             (CommandClass) => new CommandClass(),
