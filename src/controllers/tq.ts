@@ -15,14 +15,23 @@ export class TeQuieroCommand implements Command {
     async run(command: CommandModel): Promise<void> {
         await command.rawMessage.react('🥰');
         if (command.rawMessage.member?.voice.channel) {
-            const connection = await command.rawMessage.member!.voice.channel.join();
-            const dispatcher = connection.play(createReadStream('assets/tq.mp3'));
-            dispatcher.on('start', async () => {
-                await command.rawMessage.channel.send('Now playing "tq.mp3" voiced by @deviru');
-            });
-            dispatcher.on('finish', async () => {
-                connection.disconnect();
-            });
+            const permissions = command.rawMessage.member.voice.channel.permissionsFor(command.rawMessage.client.user!);
+            if (permissions!.has("CONNECT") || permissions!.has("SPEAK")) {
+                const connection = await command.rawMessage.member!.voice.channel.join();
+                const dispatcher = connection.play(createReadStream('assets/tq.mp3'));
+                dispatcher.on('start', async () => {
+                    await command.rawMessage.channel.send('Now playing "tq.mp3" voiced by @deviru');
+                });
+                dispatcher.on('finish', async () => {
+                    connection.disconnect();
+                });
+            } else {
+                await command.rawMessage.channel.send(
+                    new MessageEmbed()
+                    .setTitle('I don\'t have enough permissions to do this')
+                    .setDescription('I need the permissions to join and speak in your voice channel!')
+                )
+            }
         } else {
             await command.rawMessage.channel.send(
                 new MessageEmbed()
