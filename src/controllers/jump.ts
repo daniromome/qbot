@@ -1,34 +1,35 @@
-import { MessageEmbed } from 'discord.js';
+import { queue } from './../models/queue';
 import { roles } from './../config/role';
 import { CommandModel } from '../models/command';
 import { Command } from '../interfaces/command';
-import { queue } from '../models/queue';
+import { MessageEmbed } from 'discord.js';
 
-export class SkipCommand implements Command {
-    readonly aliases = ['skip', 'next'];
+export class JumpCommand implements Command {
+    readonly aliases = ['jump'];
     readonly permission = roles.qbitor;
 
     getHelpMessage(): string {
-        return `I can play the next song if there is one.`;
+        return `Tell me which song in the queue I should play`;
     }
 
     async run(command: CommandModel): Promise<void> {
-        if (command.rawMessage.member?.voice.channel) {
+        if(command.args[0]) {
             try {
-                const nextSong = queue.skip();
-                queue.play(nextSong, command.rawMessage.channel);
+                const pos = Number(command.args[0]);
+                const song = queue.jump(pos);
+                queue.play(song, command.rawMessage.channel);    
             } catch (error) {
                 await command.rawMessage.channel.send(
                     new MessageEmbed()
-                    .setTitle('How am I supposed to sing!?')
+                    .setTitle('I\'d spam ping you with \'**?**\' if we were on League I swear')
                     .setDescription(error.message)
                 );
             }
         } else {
             await command.rawMessage.channel.send(
                 new MessageEmbed()
-                .setTitle('You can only play music in a voice channel')
-                .setDescription('Connect to a voice channel so I can sing you a song')
+                .setTitle('I didn\'t quite got that')
+                .setDescription('make sure you\'re using a number as the argument')
             );
         }
     }
