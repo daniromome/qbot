@@ -1,3 +1,5 @@
+import { StopCommand } from './stop';
+import { QueueCommand } from './queue';
 import { roles } from './../config/role';
 import { Message, MessageEmbed } from 'discord.js';
 import { Command } from '../interfaces/command';
@@ -7,6 +9,8 @@ import { CommandModel } from '../models/command';
 import { react } from './reaction';
 import { TeQuieroCommand } from './tq';
 import { PlayCommand } from './play';
+import { SkipCommand } from './skip';
+import { JumpCommand } from './jump';
 
 export class CommandProcessor {
     private commands: Command[];
@@ -14,7 +18,7 @@ export class CommandProcessor {
     private readonly prefix: string;
 
     constructor(prefix: string) {
-        const commandClasses = [PingCommand, TeQuieroCommand, PlayCommand];
+        const commandClasses = [PingCommand, TeQuieroCommand, PlayCommand, QueueCommand, SkipCommand, JumpCommand, StopCommand];
 
         this.commands = commandClasses.map(
             (CommandClass) => new CommandClass(),
