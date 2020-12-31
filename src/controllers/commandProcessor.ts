@@ -14,6 +14,10 @@ import { JumpCommand } from './jump';
 import { ResumeCommand } from './resume';
 import { KillCommand } from './kill';
 import { LoopCommand } from './loop';
+import { SongCommand } from './song';
+import { ConnectCommand } from './connect';
+import { ClearCommand } from './clear';
+import { RemoveCommand } from './remove';
 
 export class CommandProcessor {
     private commands: Command[];
@@ -31,7 +35,11 @@ export class CommandProcessor {
             StopCommand,
             ResumeCommand,
             KillCommand,
-            LoopCommand
+            LoopCommand,
+            SongCommand,
+            ConnectCommand,
+            ClearCommand,
+            RemoveCommand
         ];
 
         this.commands = commandClasses.map(
