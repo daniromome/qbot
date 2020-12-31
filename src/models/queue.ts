@@ -139,6 +139,29 @@ class Queue {
         this.nowPlaying = 0;
         this.songList = [];
     }
+    async shuffleQueue() {
+        if (this.loop === 'disabled') {
+            const queue = this.songList.splice(this.nowPlaying + 1, this.songList.length - this.nowPlaying + 1);
+            const shuffledQueue = await this.shuffle(queue) as Song[];
+            this.songList = [ ...this.songList, ...shuffledQueue ];
+        } else {
+            const currentSong = this.songList[this.nowPlaying];
+            const shuffledQueue = await this.shuffle(this.songList) as Song[];
+            this.nowPlaying = shuffledQueue.indexOf(currentSong);
+            this.songList = shuffledQueue;
+        }
+    }
+    private shuffle(array: Array<any>) {
+        return new Promise(resolve => {
+            for (let index = array.length-1; index > 0; index--) {
+                const r = Math.floor(Math.random() * (index + 1))
+                let swap = array[index];
+                array[index] = array[r]
+                array[r] = swap;
+            }
+            resolve(array);
+        });
+    }
 }
 
 export const queue = new Queue();

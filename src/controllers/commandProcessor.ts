@@ -18,6 +18,7 @@ import { SongCommand } from './song';
 import { ConnectCommand } from './connect';
 import { ClearCommand } from './clear';
 import { RemoveCommand } from './remove';
+import { ShuffleCommand } from './shuffle';
 
 export class CommandProcessor {
     private commands: Command[];
@@ -39,7 +40,8 @@ export class CommandProcessor {
             SongCommand,
             ConnectCommand,
             ClearCommand,
-            RemoveCommand
+            RemoveCommand,
+            ShuffleCommand
         ];
 
         this.commands = commandClasses.map(
