@@ -13,35 +13,38 @@ export class PlayCommand implements Command {
     }
 
     async run(command: CommandModel): Promise<void> {
-        if (command.rawMessage.member?.voice.channel) {
-            const permissions = command.rawMessage.member.voice.channel.permissionsFor(command.rawMessage.client.user!);
-            if (permissions!.has("CONNECT") || permissions!.has("SPEAK")) {
-                try {
-                    const song = await queue.searchSong(command.args.length > 1 ? command.args.join(' ') : command.args[0]);
-                    queue.addToQueue(song);
-                    if (queue.startQueue) {
-                        queue.connection = await command.rawMessage.member!.voice.channel.join();
-                        queue.play(song, command.rawMessage.channel);
-                    } else {
-                        await command.rawMessage.channel.send(
-                            new MessageEmbed()
-                            .setTitle('Added to queue:')
-                            .setDescription(`${song.title}`)
-                        );
-                    }
-                } catch (error) {
-                    await command.rawMessage.channel.send(
-                        new MessageEmbed()
-                        .setTitle('I couldn\'t find that song!')
-                        .setDescription('You could try with another one or a youtube link')
-                    );
+        if (!queue.connection) {
+            if (command.rawMessage.member?.voice.channel) {
+                const permissions = command.rawMessage.member.voice.channel.permissionsFor(command.rawMessage.client.user!);
+                if (permissions!.has("CONNECT") || permissions!.has("SPEAK")) {
+                    queue.connection = await command.rawMessage.member!.voice.channel.join();
                 }
+            } else {
+                await command.rawMessage.channel.send(
+                    new MessageEmbed()
+                    .setTitle('You can only play music in a voice channel')
+                    .setDescription('Connect to a voice channel so I can sing you a song')
+                );
             }
-        } else {
+        }
+
+        try {
+            const song = await queue.searchSong(command.args.length > 1 ? command.args.join(' ') : command.args[0]);
+            queue.addToQueue(song);
+            if (queue.startQueue) {
+                queue.play(song, command.rawMessage.channel);
+            } else {
+                await command.rawMessage.channel.send(
+                    new MessageEmbed()
+                    .setTitle('Added to queue:')
+                    .setDescription(`${song.title}`)
+                );
+            }
+        } catch (error) {
             await command.rawMessage.channel.send(
                 new MessageEmbed()
-                .setTitle('You can only play music in a voice channel')
-                .setDescription('Connect to a voice channel so I can sing you a song')
+                .setTitle('I couldn\'t find that song!')
+                .setDescription('You could try with another one or a youtube link')
             );
         }
     }
