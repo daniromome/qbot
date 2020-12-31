@@ -9,7 +9,7 @@ export class ResumeCommand implements Command {
     readonly permission = roles.qbitor;
 
     getHelpMessage(): string {
-        return `qbot will pong(ping!?) you back.`;
+        return `Unpause me please?`;
     }
 
     async run(command: CommandModel): Promise<void> {
