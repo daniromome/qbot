@@ -11,6 +11,9 @@ import { TeQuieroCommand } from './tq';
 import { PlayCommand } from './play';
 import { SkipCommand } from './skip';
 import { JumpCommand } from './jump';
+import { ResumeCommand } from './resume';
+import { KillCommand } from './kill';
+import { LoopCommand } from './loop';
 
 export class CommandProcessor {
     private commands: Command[];
@@ -18,7 +21,18 @@ export class CommandProcessor {
     private readonly prefix: string;
 
     constructor(prefix: string) {
-        const commandClasses = [PingCommand, TeQuieroCommand, PlayCommand, QueueCommand, SkipCommand, JumpCommand, StopCommand];
+        const commandClasses = [
+            PingCommand,
+            TeQuieroCommand,
+            PlayCommand,
+            QueueCommand,
+            SkipCommand,
+            JumpCommand,
+            StopCommand,
+            ResumeCommand,
+            KillCommand,
+            LoopCommand
+        ];
 
         this.commands = commandClasses.map(
             (CommandClass) => new CommandClass(),
