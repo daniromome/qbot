@@ -35,13 +35,20 @@ class Queue {
     get startQueue() {
         return this.songList.length === this.nowPlaying+1
     }
+    get song() {
+        const song: Song = this.songList[this.nowPlaying];
+        return song;
+    }
     addToQueue(song: Song) {
         this.songList.push(song);
     }
     skip() {
         if (this.nowPlaying + 1 >= this.songList.length && this.loop === 'disabled') throw new Error('There are no more songs in the queue');
         if (this.loop === 'one') return this.songList[this.nowPlaying];
-        if (this.nowPlaying + 1 >= this.songList.length && this.loop === 'queue') return this.songList[0];
+        if (this.nowPlaying + 1 >= this.songList.length && this.loop === 'queue') {
+            this.nowPlaying = 0;
+            return this.songList[0];
+        }
         return this.songList[++this.nowPlaying];
     }
     play(song: Song, channel: TextChannel | DMChannel | NewsChannel) {
@@ -91,6 +98,20 @@ class Queue {
         this.nowPlaying = position;
         if (number <= this.songList.length) return this.songList[position]; throw new Error(`There's no song in the position #${number}, select a song between 1 and ${this.songList.length}`);
     }
+    remove(number: number) {
+        const position = number - 1;
+        const response : { removedSong: Song, keepPlaying?: boolean, nextSong?: Song } = {
+            removedSong: this.songList.splice(position, 1)[0]
+        }
+        // console.log('position', position);
+        // console.log('now', this.nowPlaying);
+        // console.log('list', this.songList);
+        if (position === this.nowPlaying) {
+            response['keepPlaying'] = true;
+            response['nextSong'] = this.songList[position];
+        }
+        return response;
+    }
     kill() {
         if (this.connection) {
             this.connection.disconnect();
@@ -113,6 +134,10 @@ class Queue {
             break;
         }
         return this.loop;
+    }
+    resetQueue() {
+        this.nowPlaying = 0;
+        this.songList = [];
     }
 }
 
