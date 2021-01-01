@@ -7,7 +7,6 @@ import { PingCommand } from './ping';
 import { HelpCommand } from './help';
 import { CommandModel } from '../models/command';
 import { react } from './reaction';
-import { TeQuieroCommand } from './tq';
 import { PlayCommand } from './play';
 import { SkipCommand } from './skip';
 import { JumpCommand } from './jump';
@@ -28,7 +27,6 @@ export class CommandProcessor {
     constructor(prefix: string) {
         const commandClasses = [
             PingCommand,
-            TeQuieroCommand,
             PlayCommand,
             QueueCommand,
             SkipCommand,
