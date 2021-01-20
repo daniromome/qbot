@@ -21,13 +21,19 @@ class Queue {
                     maxResults: 50
                 });
                 const songs : Song[] = [];
+                let total = search.data.pageInfo?.totalResults!;
+                let next = search.data.nextPageToken;
                 if (search.data.items && search.data.items.length > 0 ) {
-                    search.data.items.forEach(i => songs.push({ title: i.snippet?.title!, id: i.snippet?.resourceId?.videoId!}));
+                    search.data.items.forEach(i => {
+                        if (i.snippet?.title !== 'Deleted video') {
+                            songs.push({ title: i.snippet?.title!, id: i.snippet?.resourceId?.videoId!});
+                        } else { 
+                            --total;
+                        }
+                    });
                 } else {
                     throw new Error('I was unable to find the playlist you were looking for');
                 }
-                let total = search.data.pageInfo?.totalResults!;
-                let next = search.data.nextPageToken;
                 while (songs.length !== total && next) {
                     const search = await service.playlistItems.list({
                         part: ['snippet', 'id'],
