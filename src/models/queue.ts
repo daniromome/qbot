@@ -18,7 +18,7 @@ class Queue {
                     part: ['snippet', 'id'],
                     playlistId: match[5],
                     key: process.env.YOUTUBETOKEN,
-                    maxResults: 5
+                    maxResults: 50
                 });
                 const songs : Song[] = [];
                 if (search.data.items && search.data.items.length > 0 ) {
