@@ -9,7 +9,10 @@
     "build": "tsc"
   },
   "author": "dani9oo",
-  "license": "",
+  "license": "MPL-2.0",
+  "repository": {
+    "url": "https://github.com/Dani9OO/qbot"
+  },
   "dependencies": {
     "@discordjs/opus": "^0.3.3",
     "discord.js": "^12.5.1",
