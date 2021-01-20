@@ -76,7 +76,6 @@ class Queue {
         return song;
     }
     addToQueue(song: Song[]) {
-        console.log(song);
         this.songList.push(...song);
     }
     skip() {
