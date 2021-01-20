@@ -9,22 +9,58 @@ class Queue {
     private loop : 'one' | 'queue' | 'disabled' = 'disabled';
     public connection : VoiceConnection | null = null;
     async searchSong(query: string) {
-        const regExp = new RegExp(/^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/);
+        const regExp = new RegExp(/^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/|[\w\-]+\?list=)?)([\w\-]+)(\S+)?$/);
         const match = query.match(regExp);
         const service = google.youtube('v3');
+        if (match) {
+            if (match[4] === '/playlist?list=') {
+                const search = await service.playlistItems.list({
+                    part: ['snippet', 'id'],
+                    playlistId: match[5],
+                    key: process.env.YOUTUBETOKEN,
+                    maxResults: 5
+                });
+                const songs : Song[] = [];
+                if (search.data.items && search.data.items.length > 0 ) {
+                    search.data.items.forEach(i => songs.push({ title: i.snippet?.title!, id: i.snippet?.resourceId?.videoId!}));
+                } else {
+                    throw new Error('I was unable to find the playlist you were looking for');
+                }
+                let total = search.data.pageInfo?.totalResults!;
+                let next = search.data.nextPageToken;
+                while (songs.length !== total && next) {
+                    const search = await service.playlistItems.list({
+                        part: ['snippet', 'id'],
+                        playlistId: match[5],
+                        key: process.env.YOUTUBETOKEN,
+                        maxResults: 50,
+                        pageToken: next
+                    });
+                    search.data.items?.forEach(i => {
+                        if (i.snippet?.title !== 'Deleted video') {
+                            songs.push({ title: i.snippet?.title!, id: i.snippet?.resourceId?.videoId!});
+                        } else { 
+                            --total;
+                        }
+                    });
+                }
+                return songs;
+            }
+        }
         const search = await service.search.list({
-            q: match && match[7].length == 11 ? match[7] : query,
+            q: match && match[5].length == 11 ? match[5] : query,
             type: ['video'],
             maxResults: 1,
             part: ['snippet'],
             key: process.env.YOUTUBETOKEN
         });
-        if (search.data.items!.length > 0) {
+        
+        if (search.data.items && search.data.items.length > 0) {
             const song: Song = {
-                title: `${search.data.items![0].snippet!.title}`,
-                id: `${search.data.items![0].id!.videoId}`
+                title: `${search.data.items[0].snippet!.title}`,
+                id: `${search.data.items[0].id!.videoId}`
             }
-            return song;
+            return [song];
         } else {
             throw new Error('There aren\'t any songs that match your search query.');
         }
@@ -33,14 +69,15 @@ class Queue {
         if (this.songList.length < 1) return null; return this.songList;
     }
     get startQueue() {
-        return this.songList.length === this.nowPlaying+1
+        return this.songList.length > 0 && this.nowPlaying === 0
     }
     get song() {
         const song: Song = this.songList[this.nowPlaying];
         return song;
     }
-    addToQueue(song: Song) {
-        this.songList.push(song);
+    addToQueue(song: Song[]) {
+        console.log(song);
+        this.songList.push(...song);
     }
     skip() {
         if (this.nowPlaying + 1 >= this.songList.length && this.loop === 'disabled') throw new Error('There are no more songs in the queue');

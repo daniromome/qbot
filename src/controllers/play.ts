@@ -30,14 +30,22 @@ export class PlayCommand implements Command {
 
         try {
             const song = await queue.searchSong(command.args.length > 1 ? command.args.join(' ') : command.args[0]);
+            const l = queue.get ? queue.get.length : 1;
             queue.addToQueue(song);
             if (queue.startQueue) {
-                queue.play(song, command.rawMessage.channel);
+                if (song.length > 1) {
+                    await command.rawMessage.channel.send(
+                        new MessageEmbed()
+                        .setTitle('Added to queue:')
+                        .setDescription(`${song.map((s, i) => `**${i+l})** ${s.title}`).join('\n')}`)
+                    );
+                }
+                queue.play(song[0], command.rawMessage.channel);
             } else {
                 await command.rawMessage.channel.send(
                     new MessageEmbed()
                     .setTitle('Added to queue:')
-                    .setDescription(`${song.title}`)
+                    .setDescription(`${song.map((s, i) => `**${i+l})** ${s.title}`).join('\n')}`)
                 );
             }
         } catch (error) {
