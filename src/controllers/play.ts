@@ -41,6 +41,7 @@ export class PlayCommand implements Command {
                 );
             }
         } catch (error) {
+            console.log(error);
             await command.rawMessage.channel.send(
                 new MessageEmbed()
                 .setTitle('I couldn\'t find that song!')
